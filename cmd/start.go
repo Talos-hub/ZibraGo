@@ -1,6 +1,5 @@
 /*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2025 Talos-hub wishpersofthenine@gmail.com
 */
 package cmd
 

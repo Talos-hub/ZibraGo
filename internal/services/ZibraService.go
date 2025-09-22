@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/Talos-hub/ZibraGo/ports"
+	"github.com/Talos-hub/ZibraGo/internal/ports"
 )
 
 type ZibraService struct {
