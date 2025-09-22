@@ -44,8 +44,9 @@ func (a *ZipArchiver) Start(paths ...string) (*os.File, error) {
 	zipfile, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		if os.IsExist(err) {
-			return nil, apperrors.NewAppError("error to start zip Archiver, the file allready exist", "Start", apperrors.E_CREATE, err)
+			return nil, apperrors.NewAppError("error to start zip Archiver, the file already exist", "Start", apperrors.E_CREATE, err)
 		}
+		return nil, apperrors.NewAppError("error open a file", "Start", apperrors.E_OPEN, err)
 	}
 
 	zipWriter := zip.NewWriter(zipfile)
@@ -56,6 +57,7 @@ func (a *ZipArchiver) Start(paths ...string) (*os.File, error) {
 		err := addFileToZip(zipWriter, paths[0], a.mu)
 		if err != nil {
 			defer zipfile.Close()
+			os.Remove(zipfile.Name())
 			return nil, apperrors.NewAppError("error add a single file to zip", "addFileToZip", apperrors.E_ADD, err)
 		}
 		return zipfile, nil
@@ -121,7 +123,7 @@ func addFileToZip(zipWriter *zip.Writer, filename string, mu *sync.Mutex) error 
 	// set headerinfo
 	header, err := zip.FileInfoHeader(info)
 	if err != nil {
-		return fmt.Errorf("error to set file info haader: %w", err)
+		return fmt.Errorf("error to set file info header: %w", err)
 	}
 
 	header.Method = zip.Deflate
@@ -143,7 +145,7 @@ func addFileToZip(zipWriter *zip.Writer, filename string, mu *sync.Mutex) error 
 	return nil
 }
 
-// isFolder is helper function, check that path to folder exist
+// isFolder is helper function, check that path of folder exist
 func (z *ZipArchiver) isFolder() error {
 	info, err := os.Stat(z.pathToFolder)
 	if err != nil {
