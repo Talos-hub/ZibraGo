@@ -5,12 +5,12 @@ import (
 )
 
 type ZibraService struct {
-	walker  ports.Wakler
+	walker  ports.Walker
 	arhiver ports.Archiver
 	api     ports.ApiCloud
 }
 
-func NewZibra(walker ports.Wakler, arhiver ports.Archiver, api ports.ApiCloud) *ZibraService {
+func NewZibra(walker ports.Walker, arhiver ports.Archiver, api ports.ApiCloud) *ZibraService {
 	return &ZibraService{
 		walker:  walker,
 		arhiver: arhiver,

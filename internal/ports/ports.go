@@ -3,7 +3,7 @@ package ports
 import "os"
 
 // Walker walk to dir and returns pathes to files
-type Wakler interface {
+type Walker interface {
 	Walk(path string) ([]string, error)
 }
 
