@@ -22,5 +22,5 @@ type Logger interface {
 type ApiCloud interface {
 	Check() error
 	Auth() error
-	SendFile(os *os.File) error
+	UpLoadFiles(os *os.File) error
 }
