@@ -31,11 +31,11 @@ func NewZipArchiver(pathTofolder string, nameZip string, maxWorkers int) *ZipArc
 }
 
 // Start create new archive and add files
-func (a *ZipArchiver) Start(paths ...string) (*os.File, error) {
+func (a *ZipArchiver) Start(paths ...string) (string, error) {
 	// Check that folder path is correct
 	err := a.isFolder()
 	if err != nil {
-		return nil, apperrors.NewAppError("error to start zip Archiver", "isFolder", apperrors.E_OPEN, err)
+		return "", apperrors.NewAppError("error to start zip Archiver", "isFolder", apperrors.E_OPEN, err)
 	}
 
 	path := filepath.Join(a.pathToFolder, a.nameZip)
@@ -44,10 +44,12 @@ func (a *ZipArchiver) Start(paths ...string) (*os.File, error) {
 	zipfile, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		if os.IsExist(err) {
-			return nil, apperrors.NewAppError("error to start zip Archiver, the file already exist", "Start", apperrors.E_CREATE, err)
+			return "", apperrors.NewAppError("error to start zip Archiver, the file already exist", "Start", apperrors.E_CREATE, err)
 		}
-		return nil, apperrors.NewAppError("error open a file", "Start", apperrors.E_OPEN, err)
+		return "", apperrors.NewAppError("error open a file", "Start", apperrors.E_OPEN, err)
 	}
+
+	defer zipfile.Close()
 
 	zipWriter := zip.NewWriter(zipfile)
 	defer zipWriter.Close()
@@ -56,11 +58,11 @@ func (a *ZipArchiver) Start(paths ...string) (*os.File, error) {
 	if len(paths) == 1 {
 		err := addFileToZip(zipWriter, paths[0], a.mu)
 		if err != nil {
-			defer zipfile.Close()
+
 			os.Remove(zipfile.Name())
-			return nil, apperrors.NewAppError("error add a single file to zip", "addFileToZip", apperrors.E_ADD, err)
+			return "", apperrors.NewAppError("error add a single file to zip", "addFileToZip", apperrors.E_ADD, err)
 		}
-		return zipfile, nil
+		return zipfile.Name(), nil
 	}
 
 	fileChan := make(chan string, len(paths))
@@ -98,11 +100,10 @@ func (a *ZipArchiver) Start(paths ...string) (*os.File, error) {
 	}
 
 	if len(sliceErrors) > 0 {
-		defer zipfile.Close()
-		return nil, fmt.Errorf("multiple errors occurred: %v", sliceErrors)
+		return "", fmt.Errorf("multiple errors occurred: %v", sliceErrors)
 	}
 
-	return zipfile, nil
+	return zipfile.Name(), nil
 }
 
 // addFileToZip add a single file to zip

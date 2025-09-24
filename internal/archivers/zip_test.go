@@ -76,9 +76,14 @@ func TestZipArchiver_SingleFile(t *testing.T) {
 
 	file := filepath.Join(tempDir, files[0])
 
-	zip, err := archivers.Start(file)
+	zipPath, err := archivers.Start(file)
 	if err != nil {
 		t.Errorf("Failed to create archive, %v", err)
+	}
+
+	zip, err := os.Open(zipPath)
+	if err != nil {
+		t.Errorf("Failed to open zip file, %v", err)
 	}
 	defer zip.Close()
 
@@ -111,9 +116,14 @@ func TestZipArchiver_MultipleFiles(t *testing.T) {
 
 	crateTestFiles(t, tempDir, testFiles)
 
-	zip, err := archiver.Start(files...)
+	zipPath, err := archiver.Start(files...)
 	if err != nil {
 		t.Errorf("failed to create archive: %v", err)
+	}
+
+	zip, err := os.Open(zipPath)
+	if err != nil {
+		t.Errorf("Failed to open zip file, %v", err)
 	}
 	defer zip.Close()
 
@@ -171,7 +181,7 @@ func BenchmarkZipArchiverStart(b *testing.B) {
 		if err != nil {
 			b.Fatalf("Benchmark failed: %v", err)
 		}
-		zipFile.Close()
+		fmt.Println(zipFile)
 	}
 
 }

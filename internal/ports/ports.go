@@ -9,7 +9,7 @@ type Walker interface {
 
 // Archiver create new archiv and retrun it
 type Archiver interface {
-	Start(paths ...string) (*os.File, error)
+	Start(paths ...string) (string, error)
 }
 
 type Logger interface {
@@ -21,5 +21,6 @@ type Logger interface {
 
 type ApiCloud interface {
 	Check() error
+	Auth() error
 	SendFile(os *os.File) error
 }
