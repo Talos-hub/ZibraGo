@@ -31,16 +31,28 @@ func NewZibra(walker ports.Walker, arhiver ports.Archiver, api ports.ApiCloud, l
 
 // Run starts work service.
 func (z *ZibraService) Run(dir string) error {
+
+	// check connect to api
+	err := z.api.Check()
+	if err != nil {
+		z.logger.Error("Cloud API unavailable", "error", err)
+		return fmt.Errorf("cloud API unavailable: %w", err)
+	}
+
 	// scan dir
 	pathes, err := z.walker.Walk(dir)
 	if err != nil {
-		z.logger.Error("Error walk", "error", err)
+		z.logger.Error("Error scanning directory", "error", err)
+		return fmt.Errorf("scan error: %w", err)
 	}
 
 	if len(pathes) == 0 {
 		z.logger.Warn("Directory is empty", "Dir", pathes)
 		return apperrors.NewAppError("dirictory is empty", "Run", apperrors.E_EMPTY_DIR, nil)
 	}
+
+	z.logger.Info("Files found", "count", len(pathes))
+
 	// start archiving files
 	filepath, err := z.arhiver.Start(pathes...)
 	if err != nil {
@@ -59,20 +71,10 @@ func (z *ZibraService) Run(dir string) error {
 	}
 	defer zipFile.Close()
 
-	// check connect to api
-	err = z.api.Check()
+	err = z.api.UpLoadFile(zipFile)
 	if err != nil {
-		z.logger.Error("Failed connect to cloud api", "error", err)
-		//TODO
-		// add zip file to path file
-		return fmt.Errorf("failed to connect to cloud api, zip file was added to path list: %w", err)
-	}
-
-	err = z.api.UpLoadFiles(zipFile)
-	if err != nil {
-		//TODO
-		// add zip file to path file
-		return fmt.Errorf("error upload files, filename: %s, err: %w", zipFile.Name(), err)
+		z.logger.Error("Upload failed", "error", err)
+		return fmt.Errorf("upload error: %w", err)
 	}
 
 	return nil

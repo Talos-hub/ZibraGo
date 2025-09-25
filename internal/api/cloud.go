@@ -51,8 +51,8 @@ func NewGoogleCloudApi(token []byte) (*GoogleCloudApi, error) {
 	}, nil
 }
 
-// Auth is authorization function, for chanching a google drive
-func (a *GoogleCloudApi) Auth(token []byte) error {
+// Reauth is authorization function, for chanching a google drive
+func (a *GoogleCloudApi) Reauth(token []byte) error {
 	config, err := google.ConfigFromJSON(token, drive.DriveFileScope)
 	if err != nil {
 		return apperrors.NewAppError("error create google cloud api, unable to parse client secret file to config", "NewGoogleCloudApi", apperrors.E_PARSE, err)
@@ -83,7 +83,7 @@ func (a *GoogleCloudApi) Check() error {
 }
 
 // UploadFiles create new file in gogole drive
-func (a *GoogleCloudApi) UpLoadFiles(file *os.File) error {
+func (a *GoogleCloudApi) UpLoadFile(file *os.File) error {
 	_, err := file.Seek(0, 0) // Reset file pointer
 	if err != nil {
 		return apperrors.NewAppError("cannot seek file", "UploadFile", apperrors.E_READ, err)
