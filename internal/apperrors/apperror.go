@@ -14,6 +14,7 @@ const (
 	E_OPEN
 	E_MULTIPLE // when got a lot of errors
 	E_ADD
+	E_EMPTY_DIR
 )
 
 type AppError struct {

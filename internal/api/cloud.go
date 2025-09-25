@@ -15,6 +15,10 @@ import (
 	"google.golang.org/api/option"
 )
 
+const (
+	pathtotoken = "token.json"
+)
+
 type GoogleCloudApi struct {
 	service *drive.Service
 }
@@ -47,6 +51,28 @@ func NewGoogleCloudApi(token []byte) (*GoogleCloudApi, error) {
 	}, nil
 }
 
+// Auth is authorization function, for chanching a google drive
+func (a *GoogleCloudApi) Auth(token []byte) error {
+	config, err := google.ConfigFromJSON(token, drive.DriveFileScope)
+	if err != nil {
+		return apperrors.NewAppError("error create google cloud api, unable to parse client secret file to config", "NewGoogleCloudApi", apperrors.E_PARSE, err)
+	}
+
+	// show a token to user
+	config.RedirectURL = "urn:ietf:wg:oauth:2.0:oob"
+
+	tok, err := getTokenFromWeb(config)
+	if err != nil {
+		return apperrors.NewAppError("error get token from web", "Auth", apperrors.E_PARSE, err)
+	}
+
+	err = saveToken(pathtotoken, tok)
+	if err != nil {
+		return apperrors.NewAppError("error save a token", "Auth", apperrors.E_CREATE, err)
+	}
+	return nil
+}
+
 // Check check connect to google drive
 func (a *GoogleCloudApi) Check() error {
 	_, err := a.service.About.Get().Fields("user").Do()
@@ -56,6 +82,7 @@ func (a *GoogleCloudApi) Check() error {
 	return nil
 }
 
+// UploadFiles create new file in gogole drive
 func (a *GoogleCloudApi) UpLoadFiles(file *os.File) error {
 	_, err := file.Seek(0, 0) // Reset file pointer
 	if err != nil {

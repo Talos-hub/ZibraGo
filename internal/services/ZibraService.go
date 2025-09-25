@@ -1,6 +1,10 @@
 package services
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/Talos-hub/ZibraGo/internal/apperrors"
 	"github.com/Talos-hub/ZibraGo/internal/ports"
 )
 
@@ -8,12 +12,68 @@ type ZibraService struct {
 	walker  ports.Walker
 	arhiver ports.Archiver
 	api     ports.ApiCloud
+	logger  ports.Logger
 }
 
-func NewZibra(walker ports.Walker, arhiver ports.Archiver, api ports.ApiCloud) *ZibraService {
+// NewZibra returns pointer to ZibraService
+func NewZibra(walker ports.Walker, arhiver ports.Archiver, api ports.ApiCloud, logger ports.Logger) (*ZibraService, error) {
+	// check interfaces
+	if walker == nil || arhiver == nil || api == nil {
+		return nil, apperrors.NewAppError("expected non-nil parameters", "NewZibra", apperrors.E_FATAL, nil)
+	}
 	return &ZibraService{
 		walker:  walker,
 		arhiver: arhiver,
 		api:     api,
+		logger:  logger,
+	}, nil
+}
+
+// Run starts work service.
+func (z *ZibraService) Run(dir string) error {
+	// scan dir
+	pathes, err := z.walker.Walk(dir)
+	if err != nil {
+		z.logger.Error("Error walk", "error", err)
 	}
+
+	if len(pathes) == 0 {
+		z.logger.Warn("Directory is empty", "Dir", pathes)
+		return apperrors.NewAppError("dirictory is empty", "Run", apperrors.E_EMPTY_DIR, nil)
+	}
+	// start archiving files
+	filepath, err := z.arhiver.Start(pathes...)
+	if err != nil {
+		z.logger.Error("Error start zip archiver", "error", err)
+		return fmt.Errorf("error run zibra service: %w", err)
+	}
+	// open a zip file
+	zipFile, err := os.Open(filepath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			z.logger.Error("Fatal error, zip file is not exist", "error", err)
+			return apperrors.NewAppError("error, zip file is not exit", "Run", apperrors.E_FATAL, err)
+		}
+		z.logger.Error("Error open a zip file", "error", err)
+		return apperrors.NewAppError("error open zip file", "Run", apperrors.E_OPEN, err)
+	}
+	defer zipFile.Close()
+
+	// check connect to api
+	err = z.api.Check()
+	if err != nil {
+		z.logger.Error("Failed connect to cloud api", "error", err)
+		//TODO
+		// add zip file to path file
+		return fmt.Errorf("failed to connect to cloud api, zip file was added to path list: %w", err)
+	}
+
+	err = z.api.UpLoadFiles(zipFile)
+	if err != nil {
+		//TODO
+		// add zip file to path file
+		return fmt.Errorf("error upload files, filename: %s, err: %w", zipFile.Name(), err)
+	}
+
+	return nil
 }
