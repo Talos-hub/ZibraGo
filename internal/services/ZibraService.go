@@ -53,6 +53,7 @@ func (z *ZibraService) Run() error {
 
 	z.logger.Info("Files found", "count", len(pathes))
 
+	fmt.Println("\nStart archiving...")
 	// start archiving files
 	filepath, err := z.arhiver.Start(pathes...)
 	if err != nil {
@@ -71,11 +72,16 @@ func (z *ZibraService) Run() error {
 	}
 	defer zipFile.Close()
 
+	fmt.Println("\nThe archiving was done well")
+
+	fmt.Println("\nStart uploads files...")
 	err = z.api.UpLoadFile(zipFile)
 	if err != nil {
 		z.logger.Error("Upload failed", "error", err)
 		return fmt.Errorf("upload error: %w", err)
 	}
+
+	fmt.Println("Successful!!!")
 
 	return nil
 }
