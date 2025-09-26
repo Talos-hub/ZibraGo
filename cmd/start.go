@@ -31,6 +31,15 @@ var startCmd = &cobra.Command{
 		name := args[0]
 		folder := args[1]
 
+		if len(folder) == 0 {
+			fmt.Println("Length of path to folder cannot less than ziro")
+			return
+		}
+		if len(name) == 0 {
+			fmt.Println("Length of name zip file cannot be")
+			return
+		}
+
 		// check that name of a zip file is valid
 		if !archivers.IsZip(name) {
 			fmt.Println("Name of zip file should contatins .zip extenction")

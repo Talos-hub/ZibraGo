@@ -26,7 +26,7 @@ func (w *Walker) Walk() ([]string, error) {
 	}
 
 	if !info.IsDir() {
-		return nil, apperrors.NewAppError("path is not dir", "Walk", apperrors.E_OPEN, err)
+		return nil, apperrors.NewAppError("path is not dir", "Walk", apperrors.E_OPEN, nil)
 	}
 
 	pathes := make([]string, 0, 100)

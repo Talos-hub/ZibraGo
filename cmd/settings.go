@@ -21,8 +21,7 @@ var settingsCmd = &cobra.Command{
 		var path string
 		_, err := fmt.Scan(&path)
 		if err != nil {
-			fmt.Println("Error to set path")
-
+			fmt.Printf("Error to set path: %v\n", err)
 		}
 
 		err = configuration.NewPath(path)
