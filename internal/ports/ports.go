@@ -4,7 +4,7 @@ import "os"
 
 // Walker walk to dir and returns pathes to files
 type Walker interface {
-	Walk(path string) ([]string, error)
+	Walk() ([]string, error)
 }
 
 // Archiver create new archiv and retrun it
@@ -21,6 +21,5 @@ type Logger interface {
 
 type ApiCloud interface {
 	Check() error
-	Reauth() error
 	UpLoadFile(os *os.File) error
 }

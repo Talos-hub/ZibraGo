@@ -171,3 +171,14 @@ func saveToken(path string, token *oauth2.Token) error {
 	}
 	return nil
 }
+
+func LoadCredentials() ([]byte, error) {
+	b, err := os.ReadFile("credentials.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("fatal error, credentials.json required: %w", err)
+		}
+		return nil, fmt.Errorf("fatal error open a credentials.json: %w", err)
+	}
+	return b, nil
+}

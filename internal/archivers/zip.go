@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/Talos-hub/ZibraGo/internal/apperrors"
@@ -161,4 +162,13 @@ func (z *ZipArchiver) isFolder() error {
 	}
 
 	return nil
+}
+
+func IsZip(file string) bool {
+
+	if len(file) < 4 {
+		return false
+	}
+
+	return strings.Contains(file, ".zip")
 }

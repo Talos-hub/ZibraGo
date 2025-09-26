@@ -30,7 +30,7 @@ func NewZibra(walker ports.Walker, arhiver ports.Archiver, api ports.ApiCloud, l
 }
 
 // Run starts work service.
-func (z *ZibraService) Run(dir string) error {
+func (z *ZibraService) Run() error {
 
 	// check connect to api
 	err := z.api.Check()
@@ -40,7 +40,7 @@ func (z *ZibraService) Run(dir string) error {
 	}
 
 	// scan dir
-	pathes, err := z.walker.Walk(dir)
+	pathes, err := z.walker.Walk()
 	if err != nil {
 		z.logger.Error("Error scanning directory", "error", err)
 		return fmt.Errorf("scan error: %w", err)
