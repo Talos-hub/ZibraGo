@@ -20,7 +20,7 @@ func GetDir() (*Config, error) {
 		if os.IsNotExist(err) {
 			return nil, err
 		}
-		return nil, apperrors.NewAppError("error open config file", "GetDir", apperrors.E_OPEN, err)
+		return nil, apperrors.NewAppError("error open configuration file", "GetDir", apperrors.E_OPEN, err)
 	}
 	defer file.Close()
 
