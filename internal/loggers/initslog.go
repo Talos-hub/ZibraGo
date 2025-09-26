@@ -1,6 +1,7 @@
 package loggers
 
 import (
+	"bufio"
 	"fmt"
 	"log/slog"
 	"os"
@@ -32,5 +33,27 @@ func createLogFolder() error {
 	if err != nil {
 		return fmt.Errorf("failed to create log directory: %w", err)
 	}
+	return nil
+}
+
+func Show() error {
+	file, err := os.Open(LogPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	// Read line by line until EOF
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+
+	// Check for errors AFTER the loop
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("error scanning file: %w", err)
+	}
+
 	return nil
 }
