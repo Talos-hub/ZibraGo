@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
+Copyright © 2025 Talos-hub wishpersofthenine@gmail.com
 */
 package cmd
 
@@ -18,12 +18,14 @@ var logCmd = &cobra.Command{
 	Long:  `Shows all logs`,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := loggers.Show()
-		if os.IsNotExist(err) {
-			fmt.Println("Log file not exists")
-			return
+		if err != nil {
+			if os.IsNotExist(err) {
+				fmt.Println("Log file not exists")
+				return
+			}
 		}
 
-		fmt.Printf("Error show log %v\n", err)
+		fmt.Printf("Error show logs %v\n", err)
 	},
 }
 
