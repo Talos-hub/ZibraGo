@@ -70,7 +70,7 @@ var startCmd = &cobra.Command{
 		// workers = amount of cpu * 2
 		cpu := runtime.NumCPU() * 2
 		// setup zip archiver
-		zip := archivers.NewZipArchiver(config.ZipDir, name, cpu)
+		zip := archivers.NewZipArchiver(config.ZipDir, folder, name, cpu)
 		// setup walker
 		wakler := walkers.NewWalker(folder)
 
@@ -78,7 +78,7 @@ var startCmd = &cobra.Command{
 		token, err := api.LoadCredentials()
 		if err != nil {
 			logger.Error("Error get credentials token", "error", err)
-			fmt.Println("Error get credentiald file, you can see a log file with command: log")
+			fmt.Println("Error get credentials file, you can see a log file with command: log")
 			return
 		}
 		// setup cloud api

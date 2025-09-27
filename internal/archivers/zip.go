@@ -14,6 +14,7 @@ import (
 
 type ZipArchiver struct {
 	pathToFolder string
+	basePath     string // Base path for relative calculations (folder)
 	nameZip      string
 	maxWorkers   int
 	mu           *sync.Mutex
@@ -21,9 +22,10 @@ type ZipArchiver struct {
 }
 
 // NewZipArchiver returns a pointer to ZipArchiver
-func NewZipArchiver(pathTofolder string, nameZip string, maxWorkers int) *ZipArchiver {
+func NewZipArchiver(pathTofolder string, basePath string, nameZip string, maxWorkers int) *ZipArchiver {
 	return &ZipArchiver{
 		pathToFolder: pathTofolder,
+		basePath:     basePath,
 		nameZip:      nameZip,
 		maxWorkers:   maxWorkers,
 		wg:           &sync.WaitGroup{},
@@ -57,7 +59,7 @@ func (a *ZipArchiver) Start(paths ...string) (string, error) {
 
 	// add single file to zip
 	if len(paths) == 1 {
-		err := addFileToZip(zipWriter, paths[0], a.mu)
+		err := addFileToZip(zipWriter, paths[0], a.basePath, a.mu)
 		if err != nil {
 
 			os.Remove(zipfile.Name())
@@ -76,7 +78,7 @@ func (a *ZipArchiver) Start(paths ...string) (string, error) {
 			defer a.wg.Done()
 
 			for filepath := range fileChan {
-				if err := addFileToZip(zipWriter, filepath, a.mu); err != nil {
+				if err := addFileToZip(zipWriter, filepath, a.basePath, a.mu); err != nil {
 					errChan <- apperrors.NewAppError("error add files to zip", "addFileToZip", apperrors.E_ADD, err)
 				}
 			}
@@ -110,7 +112,7 @@ func (a *ZipArchiver) Start(paths ...string) (string, error) {
 }
 
 // addFileToZip add a single file to zip
-func addFileToZip(zipWriter *zip.Writer, filename string, mu *sync.Mutex) error {
+func addFileToZip(zipWriter *zip.Writer, filename string, basepath string, mu *sync.Mutex) error {
 	// open a file
 	file, err := os.Open(filename)
 	if err != nil {
@@ -130,8 +132,15 @@ func addFileToZip(zipWriter *zip.Writer, filename string, mu *sync.Mutex) error 
 		return fmt.Errorf("error to set file info header: %w", err)
 	}
 
+	relativePath, err := filepath.Rel(basepath, filename)
+	if err != nil {
+		return fmt.Errorf("error calculating relative path for: %s, %w", filename, err)
+	}
+
+	relativePath = filepath.ToSlash(relativePath)
+
 	header.Method = zip.Deflate
-	header.Name = filepath.Base(filename)
+	header.Name = relativePath
 	// lock function for safe zipWriter
 	mu.Lock()
 	defer mu.Unlock()
