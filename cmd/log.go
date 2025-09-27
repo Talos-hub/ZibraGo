@@ -17,15 +17,16 @@ var logCmd = &cobra.Command{
 	Short: "Shows all logs",
 	Long:  `Shows all logs`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// show all logs if file is not found, is says to user
 		err := loggers.Show()
 		if err != nil {
 			if os.IsNotExist(err) {
 				fmt.Println("Log file not exists")
 				return
 			}
+			fmt.Printf("Error show logs %v\n", err)
 		}
 
-		fmt.Printf("Error show logs %v\n", err)
 	},
 }
 

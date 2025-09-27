@@ -27,8 +27,9 @@ var startCmd = &cobra.Command{
 			fmt.Println("Expected two parameters: name of zip file and path to folder")
 			return
 		}
-
+		// name of zip file
 		name := args[0]
+		// folder that it will uploads
 		folder := args[1]
 
 		if len(folder) == 0 {
@@ -66,7 +67,7 @@ var startCmd = &cobra.Command{
 			fmt.Println("Error get configuration file, you can see a log file with command: log")
 			return
 		}
-		// workers = amout of cpu * 2
+		// workers = amount of cpu * 2
 		cpu := runtime.NumCPU() * 2
 		// setup zip archiver
 		zip := archivers.NewZipArchiver(config.ZipDir, name, cpu)
@@ -88,6 +89,7 @@ var startCmd = &cobra.Command{
 			return
 		}
 
+		// setup zibra service
 		zibra, err := services.NewZibra(wakler, zip, cloud, logger)
 		if err != nil {
 			logger.Error("Error init zibra service", "error", err)
