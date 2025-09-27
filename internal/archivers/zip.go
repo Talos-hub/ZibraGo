@@ -65,7 +65,7 @@ func (a *ZipArchiver) Start(paths ...string) (string, error) {
 		}
 		return zipfile.Name(), nil
 	}
-
+	// jobs
 	fileChan := make(chan string, len(paths))
 	errChan := make(chan error, len(paths))
 
@@ -100,7 +100,9 @@ func (a *ZipArchiver) Start(paths ...string) (string, error) {
 		}
 	}
 
+	// if there is an error, so is deletes the zip file
 	if len(sliceErrors) > 0 {
+		os.Remove(zipfile.Name())
 		return "", fmt.Errorf("multiple errors occurred: %v", sliceErrors)
 	}
 
