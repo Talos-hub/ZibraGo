@@ -85,7 +85,7 @@ func (a *ZipArchiver) Start(paths ...string) (string, error) {
 		}()
 	}
 
-	// send files to chan
+	// send files to job
 	for _, filePath := range paths {
 		fileChan <- filePath
 	}
@@ -96,6 +96,7 @@ func (a *ZipArchiver) Start(paths ...string) (string, error) {
 	close(errChan)
 	sliceErrors := make([]error, 0, len(errChan))
 
+	// append error to error slice
 	for err := range errChan {
 		if err != nil {
 			sliceErrors = append(sliceErrors, err)
@@ -108,6 +109,7 @@ func (a *ZipArchiver) Start(paths ...string) (string, error) {
 		return "", fmt.Errorf("multiple errors occurred: %v", sliceErrors)
 	}
 
+	// return full path to zip file
 	return zipfile.Name(), nil
 }
 
@@ -140,6 +142,7 @@ func addFileToZip(zipWriter *zip.Writer, filename string, basepath string, mu *s
 	relativePath = filepath.ToSlash(relativePath)
 
 	header.Method = zip.Deflate
+	// for save folder structure...
 	header.Name = relativePath
 	// lock function for safe zipWriter
 	mu.Lock()
@@ -175,6 +178,7 @@ func (z *ZipArchiver) isFolder() error {
 	return nil
 }
 
+// Is zip
 func IsZip(file string) bool {
 
 	if len(file) < 4 {
