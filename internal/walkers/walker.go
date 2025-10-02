@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/Talos-hub/ZibraGo/internal/apperrors"
 )
@@ -46,6 +47,37 @@ func (w *Walker) Walk() ([]string, error) {
 		return nil, apperrors.NewAppError("error walking", "Walk", apperrors.E_READ, err)
 	}
 
+	if len(pathes) == 0 {
+		return pathes, nil
+	}
+	//TODO
+	// get exceptions
+
+	// match extentios
+
 	return pathes, nil
 
+}
+
+// match match paths and extensions if an element from the path is
+// to an element from the extension
+// the element will not be added to the slice
+func match(paths []string, extentions map[string]bool) []string {
+	slice := make([]string, 0, len(paths)) // determine a slice
+
+	for _, item := range paths {
+		file := filepath.Base(item)
+
+		n := strings.Index(file, ".")
+		// cut unuseful
+		extention := file[n:]
+		// match
+		if _, ok := extentions[extention]; ok {
+			continue
+		}
+
+		slice = append(slice, item)
+	}
+
+	return slice
 }

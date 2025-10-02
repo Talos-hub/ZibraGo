@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -56,6 +57,61 @@ func BenchmarkWalker(b *testing.B) {
 		if err != nil {
 			b.Fatalf("Walk failed: %v", err)
 		}
+	}
+}
+
+func TestWalkerMatch_slice(t *testing.T) {
+	pathes := []string{
+		"test.exe", "test.txt",
+		"test.json", "test.dll", "test.png",
+		"test.jpg", "test.jepg",
+	}
+	extentions := map[string]bool{
+		".jpg":   true,
+		".png":   true,
+		".jepg:": true,
+	}
+
+	//act
+	slice := match(pathes, extentions)
+
+	//assert
+
+	for _, item := range slice {
+		file := filepath.Base(item)
+		n := strings.Index(file, ".")
+
+		ex := file[n:]
+
+		if _, ok := extentions[ex]; ok {
+			t.Fatalf("expected there is not a file with the extension: %s", ex)
+		}
+	}
+
+}
+
+func BenchmarkMatch(b *testing.B) {
+	// arange
+	pathes := []string{
+		"test.exe", "test.txt",
+		"test.json", "test.dll",
+		"test.png", "test2.jpg",
+		"test.jpg", "test.jepg",
+		"test3.jpg", "test4.jpg",
+		"test5.jpg", "test6.jpg",
+		"test6.jpg", "test8.jpg",
+		"test9.jpg", "test10.jpg",
+	}
+	extentions := map[string]bool{
+		".jpg":   true,
+		".png":   true,
+		".jepg:": true,
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_ = match(pathes, extentions)
 	}
 }
 
