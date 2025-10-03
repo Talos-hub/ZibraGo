@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Talos-hub/ZibraGo/internal/apperrors"
+	"github.com/Talos-hub/ZibraGo/internal/configuration"
 )
 
 type Walker struct {
@@ -50,10 +51,14 @@ func (w *Walker) Walk() ([]string, error) {
 	if len(pathes) == 0 {
 		return pathes, nil
 	}
-	//TODO
-	// get exceptions
 
-	// match extentios
+	m, err := configuration.GetExtentions()
+	if !os.IsNotExist(err) {
+		return nil, apperrors.NewAppError("error get extententios", "Walk", apperrors.E_OPEN, err)
+	}
+
+	// matching
+	pathes = match(pathes, m)
 
 	return pathes, nil
 
@@ -64,6 +69,10 @@ func (w *Walker) Walk() ([]string, error) {
 // the element will not be added to the slice
 func match(paths []string, extentions map[string]bool) []string {
 	slice := make([]string, 0, len(paths)) // determine a slice
+
+	if len(extentions) == 0 {
+		return paths
+	}
 
 	for _, item := range paths {
 		file := filepath.Base(item)

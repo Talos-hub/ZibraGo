@@ -9,6 +9,7 @@ import (
 
 const name = "zipdir.json"
 const DEFAULT_PATH = "."
+const extention = "extentions.json"
 
 type Config struct {
 	ZipDir string `json:"zipdir"`
@@ -31,6 +32,27 @@ func GetDir() (*Config, error) {
 		return nil, apperrors.NewAppError("error decoding", "GetDir", apperrors.E_PARSE, err)
 	}
 	return config, nil
+}
+
+func GetExtentions() (map[string]bool, error) {
+	file, err := os.Open(extention)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, err
+		}
+		return nil, apperrors.NewAppError("error open a file", "GetExtentions", apperrors.E_OPEN, err)
+	}
+	defer file.Close()
+
+	m := make(map[string]bool)
+
+	err = json.NewDecoder(file).Decode(&m)
+	if err != nil {
+		return nil, apperrors.NewAppError("error decoding", "GetExtentions", apperrors.E_PARSE, err)
+	}
+
+	return m, nil
+
 }
 
 func NewPath(path string) error {

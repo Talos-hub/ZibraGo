@@ -64,12 +64,13 @@ func TestWalkerMatch_slice(t *testing.T) {
 	pathes := []string{
 		"test.exe", "test.txt",
 		"test.json", "test.dll", "test.png",
-		"test.jpg", "test.jepg",
+		"test.jpg", "test.jepg", "test1.jepg",
 	}
 	extentions := map[string]bool{
-		".jpg":   true,
-		".png":   true,
-		".jepg:": true,
+		".jpg":  true,
+		".png":  true,
+		".jepg": true,
+		".dll":  true,
 	}
 
 	//act
