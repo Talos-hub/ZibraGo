@@ -10,15 +10,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	remove bool
+)
 var ExCmd = &cobra.Command{
 	Use:   "extensions",
-	Short: "Add extensions",
-	Long:  `Add extensions for files that you don't need.`,
+	Short: "Manage file extensions",
+	Long:  `Add or remove extensions for files that you don't need.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		if remove {
+			// Remove the extensions file
+			if err := configuration.RemoveExtensionsFile(); err != nil {
+				fmt.Println("Error removing extensions file:", err)
+				return
+			}
+			fmt.Println("Extensions file removed successfully")
+			return
+		}
+
 		if err := configuration.CreateExtentions(); err != nil {
 			fmt.Println(err)
 			return
 		}
+		fmt.Println("\tSuccessful.")
 	},
 }
 
