@@ -11,9 +11,9 @@ import (
 )
 
 var ExCmd = &cobra.Command{
-	Use:   "extentions",
-	Short: "Add extentions",
-	Long:  `Add extentions for files that you don't need.`,
+	Use:   "extensions",
+	Short: "Add extensions",
+	Long:  `Add extensions for files that you don't need.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := configuration.CreateExtentions(); err != nil {
 			fmt.Println(err)

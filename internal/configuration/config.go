@@ -80,14 +80,14 @@ func CreateExtentions() error {
 	// Remove the newline character at the end
 	input = strings.TrimSpace(input)
 
-	m, err := cutExtentions(input)
+	m, err := cutExtensions(input)
 	if err != nil {
-		return apperrors.NewAppError("error create extentions, wrong format", "CreateExtentions", apperrors.E_CREATE, err)
+		return apperrors.NewAppError("error create extensions, wrong format", "CreateExtensions", apperrors.E_CREATE, err)
 	}
 
 	err = json.NewEncoder(file).Encode(m)
 	if err != nil {
-		return apperrors.NewAppError("error encoding extentions", "CreatingExtentions", apperrors.E_CREATE, err)
+		return apperrors.NewAppError("error encoding extensions", "CreateExtensions", apperrors.E_CREATE, err)
 	}
 
 	return nil
@@ -95,7 +95,7 @@ func CreateExtentions() error {
 }
 
 // cutExtention cut extentions and validate them
-func cutExtentions(ex string) (map[string]bool, error) {
+func cutExtensions(ex string) (map[string]bool, error) {
 	if len(ex) == 0 {
 		return nil, errors.New("error, user input is empty")
 	}
@@ -109,14 +109,14 @@ func cutExtentions(ex string) (map[string]bool, error) {
 		n := strings.Index(s, ".")
 		// if there is no dot, so it is not an extention
 		if n == -1 {
-			return nil, fmt.Errorf("error, this: %s is not an extention", s)
+			return nil, fmt.Errorf("error, this: %s is not an extensions", s)
 		}
 
 		// cut extention
 		extention := s[n:]
 
 		if len(extention) == 1 {
-			return nil, fmt.Errorf("error, this: %s is not an extention", s)
+			return nil, fmt.Errorf("error, this: %s is not an extensions", s)
 		}
 
 		// add to map

@@ -16,7 +16,7 @@ func TestConfigurationCutExtentions_map(t *testing.T) {
 	}
 
 	//act
-	m, err := cutExtentions(ex)
+	m, err := cutExtensions(ex)
 	if err != nil {
 		t.Fatalf("Expected nil error: %v", err)
 	}
@@ -33,12 +33,12 @@ func TestConfigurationCutExtentions_error(t *testing.T) {
 	dot := ". . . . . . ."
 
 	// act
-	_, err := cutExtentions(indalidEx)
+	_, err := cutExtensions(indalidEx)
 	if err == nil {
 		t.Errorf("Expected non-nil error: %v", err)
 	}
 
-	_, err = cutExtentions(dot)
+	_, err = cutExtensions(dot)
 	if err == nil {
 		t.Errorf("Expected non-nil error: %v", err)
 	}
@@ -52,7 +52,7 @@ func BenchmarkConfigurationCutExtentions(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, err := cutExtentions(extention)
+		_, err := cutExtensions(extention)
 		if err != nil {
 			b.Fatalf("failed bench, wrong data: %v", err)
 		}
