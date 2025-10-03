@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -66,13 +67,18 @@ func CreateExtentions() error {
 	}
 	defer file.Close()
 
-	var input string
+	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println("Please enter extentions like: .exe .txt .json")
-	_, err = fmt.Scan(&input)
+	fmt.Print("> ")
+
+	input, err := reader.ReadString('\n')
 	if err != nil {
-		return apperrors.NewAppError("error scanning user input", "CreateExtentios", apperrors.E_PARSE, err)
+		return apperrors.NewAppError("error reading user input", "CreateExtentios", apperrors.E_PARSE, err)
 	}
+
+	// Remove the newline character at the end
+	input = strings.TrimSpace(input)
 
 	m, err := cutExtentions(input)
 	if err != nil {
@@ -96,7 +102,7 @@ func cutExtentions(ex string) (map[string]bool, error) {
 	if strings.Contains(ex, ",") {
 		return nil, errors.New("error format, you should write like: .json .exe .txt INSTED .json,.exe,.txt, or .json, .txt, .exe")
 	}
-	items := strings.Split(ex, " ")
+	items := strings.Fields(ex)
 	m := make(map[string]bool, len(items))
 
 	for _, s := range items {

@@ -215,7 +215,7 @@ func BenchmarkZipArchiverStart(b *testing.B) {
 	// Create files once before benchmarking
 	for _, filename := range testFiles {
 		filePath := filepath.Join(tempDir, filename)
-		// Create smaller file for faster benchmarking (100KB instead of 100MB)
+		// Create smaller file for faster benchmarking
 		content := make([]byte, 1024*100)
 		if err := os.WriteFile(filePath, content, 0644); err != nil {
 			b.Fatalf("Failed to create benchmark file: %v", err)
