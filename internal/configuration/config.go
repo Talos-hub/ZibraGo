@@ -2,7 +2,10 @@ package configuration
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/Talos-hub/ZibraGo/internal/apperrors"
 )
@@ -53,6 +56,69 @@ func GetExtentions() (map[string]bool, error) {
 
 	return m, nil
 
+}
+
+// CreateExtentios reads user input and add extentions to a file
+func CreateExtentions() error {
+	file, err := os.OpenFile(extention, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	if err != nil {
+		return apperrors.NewAppError("error create or open a file", "CreateExtentios", apperrors.E_CREATE, err)
+	}
+	defer file.Close()
+
+	var input string
+
+	fmt.Println("Please enter extentions like: .exe .txt .json")
+	_, err = fmt.Scan(&input)
+	if err != nil {
+		return apperrors.NewAppError("error scanning user input", "CreateExtentios", apperrors.E_PARSE, err)
+	}
+
+	m, err := cutExtentions(input)
+	if err != nil {
+		return apperrors.NewAppError("error create extentions, wrong format", "CreateExtentions", apperrors.E_CREATE, err)
+	}
+
+	err = json.NewEncoder(file).Encode(m)
+	if err != nil {
+		return apperrors.NewAppError("error encoding extentions", "CreatingExtentions", apperrors.E_CREATE, err)
+	}
+
+	return nil
+
+}
+
+// cutExtention cut extentions and validate them
+func cutExtentions(ex string) (map[string]bool, error) {
+	if len(ex) == 0 {
+		return nil, errors.New("error, user input is empty")
+	}
+	if strings.Contains(ex, ",") {
+		return nil, errors.New("error format, you should write like: .json .exe .txt INSTED .json,.exe,.txt, or .json, .txt, .exe")
+	}
+	items := strings.Split(ex, " ")
+	m := make(map[string]bool, len(items))
+
+	for _, s := range items {
+		n := strings.Index(s, ".")
+		// if there is no dot, so it is not an extention
+		if n == -1 {
+			return nil, fmt.Errorf("error, this: %s is not an extention", s)
+		}
+
+		// cut extention
+		extention := s[n:]
+
+		if len(extention) == 1 {
+			return nil, fmt.Errorf("error, this: %s is not an extention", s)
+		}
+
+		// add to map
+		m[extention] = true
+
+	}
+
+	return m, nil
 }
 
 func NewPath(path string) error {
