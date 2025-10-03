@@ -43,7 +43,7 @@ func (z *ZibraService) Run() error {
 	pathes, err := z.walker.Walk()
 	if err != nil {
 		z.logger.Error("Error scanning directory", "error", err)
-		return fmt.Errorf("scan error: %w", err)
+		return apperrors.NewAppError("error scanning directory", "Run", apperrors.E_READ, err)
 	}
 
 	if len(pathes) == 0 {

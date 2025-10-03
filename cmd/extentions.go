@@ -39,4 +39,5 @@ var ExCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(ExCmd)
+	ExCmd.Flags().BoolVarP(&remove, "rm", "r", false, "Remove the extensions file")
 }
