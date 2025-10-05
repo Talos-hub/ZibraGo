@@ -55,8 +55,6 @@ func (w *Walker) Walk() ([]string, error) {
 	m, err := configuration.GetExtentions()
 	if err != nil {
 		if os.IsNotExist(err) {
-			// matching
-			pathes = match(pathes, m)
 			return pathes, nil
 		}
 		return nil, apperrors.NewAppError("error get extentions", "Walk", apperrors.E_CONF, err)
