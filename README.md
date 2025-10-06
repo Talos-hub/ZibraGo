@@ -7,13 +7,13 @@
 A powerful command-line backup tool written in Go that automatically archives directories and uploads them to Google Drive.
 
  **Features**
-
-- **Smart Directory Scanning** - Recursively scans directories for files
+ 
 - **Parallel Zip Archiving** - Multi-threaded compression for optimal performance
 - **Google Drive Integration** - Seamless cloud backup functionality
 - **Configurable Settings** - Easy configuration management
 - **Structured Logging** - JSON logging with different levels
 - **High Performance** - Utilizes all available CPU cores
+- **Extensions** - Add file extensions to exclude
 
 ##  Quick Start
 
@@ -50,7 +50,15 @@ go install
 
 - **Download the credentials.json file**
 
-- **Place it in your ZibraGo working directory**
+- **Place it in your ZibraGo working directory or use env: CREDENTIALS_ZIBRA, or another paths:**
+   - ./config/credentials.json
+   - ./congiguration/credentials.json
+   - ./settings/credentials.json
+   - HOME + /.ZibraGo/credentials.json
+   - HOME + /.ZibraGo/config/credentials.json
+   - HOME + /.ZibraGo/configuration/credentials.json"
+   - HOME + /.ZibraGo/settings/credentials.json
+  
 ### First Time Setup
 ```
 # Configure backup directory
@@ -87,6 +95,10 @@ ZibraGo uses a JSON configuration file (zipdir.json) to manage settings:
   "zipdir": "/path/to/your/backup/directory"
 }
 ```
+## Add extensions
+```
+  ./zibrago extensions
+```
 
 ## Troubleshooting
 ### Common Issues
@@ -107,3 +119,8 @@ ZibraGo uses a JSON configuration file (zipdir.json) to manage settings:
 - **Delete token.json and restart the application**
 
 - **Re-authenticate when prompted**
+
+# Benchmarks
+- **Archiving** - 10 GB = 1 20846913200 ns/op  4254624 B/op  1986 allocs/o  30 sec
+- **Scaning directory** - 10 dirs, 10 files each = 519  2073578 ns/op  103618 B/op 856 allocs/o
+- **Matching extensions** - 2918161 431.2 ns/op 256 B/op 1 allocs/o
