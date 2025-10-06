@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -172,13 +173,42 @@ func saveToken(path string, token *oauth2.Token) error {
 	return nil
 }
 
+// LoadCreadentials load a json file
+// that need to use for google api.
+// It checks base pathes and env
 func LoadCredentials() ([]byte, error) {
-	b, err := os.ReadFile("credentials.json")
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("fatal error, credentials.json required: %w", err)
-		}
-		return nil, fmt.Errorf("fatal error open a credentials.json: %w", err)
+	// base path where credentials can be
+	var pathes []string = []string{
+		"credentials.json",
+		"./config/credentials.json",
+		"./congiguration/credentials.json",
+		"./settings/credentials.json",
+		os.Getenv("HOME") + "/.ZibraGo/credentials.json",
+		os.Getenv("HOME") + "/.ZibraGo/config/credentials.json",
+		os.Getenv("HOME") + "/.ZibraGo/configuration/credentials.json",
+		os.Getenv("HOME") + "/.ZibraGo/settings/credentials.json",
+		os.Getenv("CREDENTIALS_ZIBRA"),
 	}
-	return b, nil
+
+	for _, path := range pathes {
+		// read
+		b, err := os.ReadFile(path)
+		// if error == nil so file was found,
+		// then check that is json if not return error
+		if err == nil {
+			if json.Valid(b) {
+				return b, nil
+			}
+			return nil, errors.New("credentials should be in json format ")
+		}
+
+		if os.IsNotExist(err) {
+			continue
+		} else {
+			return nil, fmt.Errorf("error read credentials file: %w", err)
+		}
+
+	}
+
+	return nil, errors.New("credentials not found")
 }
